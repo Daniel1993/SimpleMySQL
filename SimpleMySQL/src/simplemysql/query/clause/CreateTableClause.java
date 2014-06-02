@@ -32,7 +32,7 @@ public class CreateTableClause {
 
   public CreateTableClause addPrimaryKey(String... column) {
     query.append("PRIMARY KEY(");
-    for (String s : column ) {
+    for (String s : column) {
       query.append("`").append(s).append("`, ");
     }
     query.replace(query.length() - 2, query.length(), "");

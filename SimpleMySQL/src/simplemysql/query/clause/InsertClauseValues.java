@@ -16,45 +16,45 @@ package simplemysql.query.clause;
  */
 public class InsertClauseValues extends ClauseCreator {
 
-    /**
-     * Initiates a InsertClauseValues instance.
-     *
-     * Starts to append the '(' character in the clause. If you print the clause
-     * before adding any columns the result will be the string "(".
-     */
-    public InsertClauseValues() {
-        query.append("(");
-    }
+  /**
+   * Initiates a InsertClauseValues instance.
+   *
+   * Starts to append the '(' character in the clause. If you print the clause
+   * before adding any columns the result will be the string "(".
+   */
+  public InsertClauseValues() {
+    query.append("(");
+  }
 
-    /**
-     * Appends a value in insert clause.
-     * 
-     * Each value is surrounded with '\'' character and followed by ',', then
-     * when toString method is called the clause is ended with ')'.
-     * 
-     * @param values the values to be appended
-     * @return this
-     */
-    public InsertClauseValues addValues(String... values) {
-        for (String v : values) {
-            String newValue = Utility.escape(v);
-            query.append("'").append(newValue).append("', ");
-        }
-        return this;
+  /**
+   * Appends a value in insert clause.
+   *
+   * Each value is surrounded with '\'' character and followed by ',', then when
+   * toString method is called the clause is ended with ')'.
+   *
+   * @param values the values to be appended
+   * @return this
+   */
+  public InsertClauseValues addValues(String... values) {
+    for (String v : values) {
+      String newValue = Utility.escape(v);
+      query.append("'").append(newValue).append("', ");
     }
+    return this;
+  }
 
-    /**
-     * Ends the values in insert clause.
-     *
-     * You must not call addValues method after you call this method. Appends
-     * ')' to the end of the clause or replases the end of the clause if ends
-     * with ',' ' ' to ')'.
-     *
-     * @return the columns in insert clause
-     */
-    @Override
-    public String toString() {
-        return Utility.endInsertClause(query);
-    }
+  /**
+   * Ends the values in insert clause.
+   *
+   * You must not call addValues method after you call this method. Appends ')'
+   * to the end of the clause or replases the end of the clause if ends with ','
+   * ' ' to ')'.
+   *
+   * @return the columns in insert clause
+   */
+  @Override
+  public String toString() {
+    return Utility.endInsertClause(query);
+  }
 
 }

@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package simplemysql.query.clause;
 
 /**
@@ -11,24 +10,25 @@ package simplemysql.query.clause;
  * @author Daniel
  */
 public class SetClause {
-    private final StringBuilder query = new StringBuilder();
 
-    public SetClause() {
-    }
+  private final StringBuilder query = new StringBuilder();
 
-    public SetClause add(String column, String value) {
-        String newValue = Utility.escape(value);
-        query.append("`").append(column).append("`='").append(newValue).
-                append("', ");
-        return this;
-    }
+  public SetClause() {
+  }
 
-    @Override
-    public String toString() {
-        if (query.length() > 0 && query.toString().endsWith(", ")) {
-            query.replace(query.length() - 2, query.length(), " ");
-        }
-        return query.toString();
+  public SetClause add(String column, String value) {
+    String newValue = Utility.escape(value);
+    query.append("`").append(column).append("`='").append(newValue).
+            append("', ");
+    return this;
+  }
+
+  @Override
+  public String toString() {
+    if (query.length() > 0 && query.toString().endsWith(", ")) {
+      query.replace(query.length() - 2, query.length(), " ");
     }
-    
+    return query.toString();
+  }
+
 }

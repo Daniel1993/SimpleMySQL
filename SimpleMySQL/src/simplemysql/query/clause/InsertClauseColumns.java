@@ -16,44 +16,44 @@ package simplemysql.query.clause;
  */
 public class InsertClauseColumns extends ClauseCreator {
 
-    /**
-     * Initiates a InsertClauseColumns instance.
-     *
-     * Starts to append the '(' character in the clause. If you print the clause
-     * before adding any columns the result will be the string "(".
-     */
-    public InsertClauseColumns() {
-        query.append("(");
-    }
+  /**
+   * Initiates a InsertClauseColumns instance.
+   *
+   * Starts to append the '(' character in the clause. If you print the clause
+   * before adding any columns the result will be the string "(".
+   */
+  public InsertClauseColumns() {
+    query.append("(");
+  }
 
-    /**
-     * Appends a column in insert clause.
-     *
-     * Each appended column is followed by the ',' character, then when toString
-     * method is called the clause is ended with ')'.
-     *
-     * @param columns the columns to be appended
-     * @return this
-     */
-    public InsertClauseColumns addColumns(String... columns) {
-        for (String c : columns) {
-            query.append("`").append(c).append("`, ");
-        }
-        return this;
+  /**
+   * Appends a column in insert clause.
+   *
+   * Each appended column is followed by the ',' character, then when toString
+   * method is called the clause is ended with ')'.
+   *
+   * @param columns the columns to be appended
+   * @return this
+   */
+  public InsertClauseColumns addColumns(String... columns) {
+    for (String c : columns) {
+      query.append("`").append(c).append("`, ");
     }
+    return this;
+  }
 
-    /**
-     * Ends the columns in insert clause.
-     *
-     * You must not call addColumns method after you call this method. Appends
-     * ')' to the end of the clause or replases the end of the clause if ends
-     * with ',' ' ' to ')'.
-     *
-     * @return the columns in insert clause
-     */
-    @Override
-    public String toString() {
-        return Utility.endInsertClause(query);
-    }
+  /**
+   * Ends the columns in insert clause.
+   *
+   * You must not call addColumns method after you call this method. Appends ')'
+   * to the end of the clause or replases the end of the clause if ends with ','
+   * ' ' to ')'.
+   *
+   * @return the columns in insert clause
+   */
+  @Override
+  public String toString() {
+    return Utility.endInsertClause(query);
+  }
 
 }
