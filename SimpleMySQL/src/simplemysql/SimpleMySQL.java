@@ -45,6 +45,7 @@ import com.mysql.jdbc.exceptions.MySQLNonTransientConnectionException;
 import java.sql.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import simplemysql.exception.SimpleMySQLException;
 
 /**
  *
@@ -196,16 +197,16 @@ public class SimpleMySQL {
    * {@link #transactionRollback()} only once after {@link #transactionBegin()}
    * was called.
    *
+   * @throws simplemysql.exception.SimpleMySQLException if SQLException ocurred
    * @see #transactionBegin()
    * @see #transactionRollback()
    */
-  public void transactionCommit() {
+  public void transactionCommit() throws SimpleMySQLException {
     try {
       mysql_connection.commit();
       mysql_connection.setAutoCommit(true);
-    } catch (SQLException ex) {
-      Logger.getLogger(getClass().getName()).
-              log(Level.WARNING, "Error happened", ex);
+    } catch (SQLException e) {
+      throw new SimpleMySQLException("Can't commit or enable auto commit", e);
     }
   }
 
@@ -217,16 +218,16 @@ public class SimpleMySQL {
    * you shouldn't call this method again, nor the {@link #transactionCommit()}
    * until you start a new transation with {@link #transactionBegin()} method.
    *
+   * @throws simplemysql.exception.SimpleMySQLException if SQLException ocurred
    * @see #transactionBegin()
    * @see #transactionCommit()
    */
-  public void transactionRollback() {
+  public void transactionRollback() throws SimpleMySQLException {
     try {
       mysql_connection.rollback(savepoint);
       mysql_connection.setAutoCommit(true);
-    } catch (SQLException ex) {
-      Logger.getLogger(getClass().getName()).
-              log(Level.WARNING, "Error happened", ex);
+    } catch (SQLException e) {
+      throw new SimpleMySQLException("Can't rollback or enable auto commit", e);
     }
   }
 
@@ -239,15 +240,16 @@ public class SimpleMySQL {
    * before {@link #transactionBegin()} is called.
    *
    * @return true if is on a transaction, false otherwise
+   * @throws simplemysql.exception.SimpleMySQLException if SQLException ocurred
    */
-  public boolean isOnTransaction() {
+  public boolean isOnTransaction() throws SimpleMySQLException {
     try {
+      // after any transaction auto commit is enabled
+      // this works because nested transaction are not supported
       return !mysql_connection.getAutoCommit();
-    } catch (SQLException ex) {
-      Logger.getLogger(getClass().getName()).
-              log(Level.WARNING, "Error happened", ex);
+    } catch (SQLException e) {
+      throw new SimpleMySQLException("Can't rollback or enable auto commit", e);
     }
-    return false;
   }
 
   /**
@@ -259,9 +261,10 @@ public class SimpleMySQL {
    * No Password
    * </p>
    *
-   * @return
+   * @return true on succeed
+   * @throws simplemysql.exception.SimpleMySQLException on fail
    */
-  public boolean connect() {
+  public boolean connect() throws SimpleMySQLException {
     return connect("mysql", "root", "");
   }
 
@@ -273,8 +276,9 @@ public class SimpleMySQL {
    * @param username
    * @param password
    * @return True on a successful connection
+   * @throws simplemysql.exception.SimpleMySQLException on failed
    */
-  public boolean connect(String server, String username, String password) {
+  public boolean connect(String server, String username, String password) throws SimpleMySQLException {
     String mysql_connectionURL;
     String mysql_driver;
 
@@ -294,15 +298,12 @@ public class SimpleMySQL {
               username, password);
       mysql_connection.setAutoCommit(true);
       return true;
-    } catch (ClassNotFoundException | SQLException ex) {
+    } catch (ClassNotFoundException | SQLException e) {
       String desc = "\nCan  not connect to the MySQL Database Server. \n"
               + "Please check your configuration.\n\n"
               + "Hostname: " + hostname_local_cache + "\n"
               + "Username: " + username_local_cache + "\n";
-      Logger.getLogger(getClass().getName()).
-              log(Level.WARNING, desc, ex);
-
-      return false;
+      throw new SimpleMySQLException(desc, e);
     }
   }
 
@@ -315,9 +316,10 @@ public class SimpleMySQL {
    * @param password
    * @param database
    * @return True on a successful connection.
+   * @throws simplemysql.exception.SimpleMySQLException on failed
    */
   public boolean connect(String server, String username, String password,
-          String database) {
+          String database) throws SimpleMySQLException {
     //cache the database for auto-auto_reconnect
     database_local_cache = database;
 
@@ -350,15 +352,14 @@ public class SimpleMySQL {
    * Closes the current MySQL Connection.
    *
    * @return True on close
+   * @throws simplemysql.exception.SimpleMySQLException on fail
    */
-  public boolean close() {
+  public boolean close() throws SimpleMySQLException {
     try {
       mysql_connection.close();
       return true;
-    } catch (SQLException ex) {
-      Logger.getLogger(getClass().getName()).
-              log(Level.WARNING, "Could not close connection.", ex);
-      return false;
+    } catch (SQLException e) {
+      throw new SimpleMySQLException("Can't close", e);
     }
   }
 
@@ -367,7 +368,7 @@ public class SimpleMySQL {
     boolean connected;
     try {
       connected = connect(server, username, password, database);
-    } catch (Exception e) {
+    } catch (SimpleMySQLException e) {
       Logger.getLogger(getClass().getName()).
               log(Level.INFO, "Could not reconnect.", e);
       connected = false;
@@ -522,13 +523,14 @@ public class SimpleMySQL {
    * @param handler processQuery method will be called every time a query
    * returns, you may rollback or continue the transaction.
    * @param queries Queries for the transaction
+   * @throws simplemysql.exception.SimpleMySQLException if SQLException ocurred
    * @see #connect()
    * @see #connect(java.lang.String, java.lang.String, java.lang.String)
    * @see #connect(java.lang.String, java.lang.String, java.lang.String,
    * java.lang.String)
    */
   public void Query(SimpleAsyncMySQLTransactionHandler handler,
-          String... queries) {
+          String... queries) throws SimpleMySQLException {
     check_connection();
     try {
       mysql_connection.setAutoCommit(false);
@@ -543,10 +545,8 @@ public class SimpleMySQL {
       }
       mysql_connection.commit();
       mysql_connection.setAutoCommit(true);
-    } catch (SQLException ex) {
-      Logger.getLogger(getClass().getName()).
-              log(Level.WARNING,
-                      "You are not connected to a MySQL server", ex);
+    } catch (SQLException e) {
+      throw new SimpleMySQLException("Can't execute query", e);
     }
   }
 }
