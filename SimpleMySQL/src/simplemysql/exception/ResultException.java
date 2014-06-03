@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package simplemysql.exception;
 
 /**
@@ -26,5 +25,5 @@ public class ResultException extends Exception {
   public ResultException(Throwable thrwbl) {
     super(thrwbl);
   }
-  
+
 }

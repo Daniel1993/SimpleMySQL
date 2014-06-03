@@ -49,7 +49,7 @@ import simplemysql.exception.SimpleMySQLException;
 
 /**
  *
- * @author Daniel Morante
+ * @author Daniel Morante, Daniel Castro
  */
 public class SimpleMySQL {
 
@@ -255,11 +255,8 @@ public class SimpleMySQL {
   /**
    * Connect to the MySQL Server using default connection parameters.
    *
-   * <p>
-   * <strong>HOST</strong>: mysql<br />
-   * <strong>USER</strong>: root<br />
-   * No Password
-   * </p>
+   * <strong>HOST</strong>: mysql
+   * <strong>USER</strong>: root No Password
    *
    * @return true on succeed
    * @throws simplemysql.exception.SimpleMySQLException on fail
@@ -278,7 +275,8 @@ public class SimpleMySQL {
    * @return True on a successful connection
    * @throws simplemysql.exception.SimpleMySQLException on failed
    */
-  public boolean connect(String server, String username, String password) throws SimpleMySQLException {
+  public boolean connect(String server, String username, String password) throws
+          SimpleMySQLException {
     String mysql_connectionURL;
     String mysql_driver;
 
@@ -295,14 +293,14 @@ public class SimpleMySQL {
       //Open Connection
       mysql_connectionURL = "jdbc:mysql://" + server;
       mysql_connection = DriverManager.getConnection(mysql_connectionURL,
-              username, password);
+                                                     username, password);
       mysql_connection.setAutoCommit(true);
       return true;
     } catch (ClassNotFoundException | SQLException e) {
-      String desc = "\nCan  not connect to the MySQL Database Server. \n"
-              + "Please check your configuration.\n\n"
-              + "Hostname: " + hostname_local_cache + "\n"
-              + "Username: " + username_local_cache + "\n";
+      String desc = "\nCan  not connect to the MySQL Database Server. \n" +
+              "Please check your configuration.\n\n" +
+              "Hostname: " + hostname_local_cache + "\n" +
+              "Username: " + username_local_cache + "\n";
       throw new SimpleMySQLException(desc, e);
     }
   }
@@ -319,7 +317,7 @@ public class SimpleMySQL {
    * @throws simplemysql.exception.SimpleMySQLException on failed
    */
   public boolean connect(String server, String username, String password,
-          String database) throws SimpleMySQLException {
+                         String database) throws SimpleMySQLException {
     //cache the database for auto-auto_reconnect
     database_local_cache = database;
 
@@ -364,7 +362,8 @@ public class SimpleMySQL {
   }
 
   private boolean reconnect(String server, String username, String password,
-          String database) throws SQLTransientConnectionException {
+                            String database) throws
+          SQLTransientConnectionException {
     boolean connected;
     try {
       connected = connect(server, username, password, database);
@@ -376,8 +375,8 @@ public class SimpleMySQL {
 
     if (!connected) {
       throw new SQLTransientConnectionException(
-              "Unable to re-establish database connection,"
-              + "please try again later.");
+              "Unable to re-establish database connection," +
+               "please try again later.");
     }
     Logger.getLogger(getClass().getName()).
             log(Level.INFO, "Database connection re-established");
@@ -403,13 +402,13 @@ public class SimpleMySQL {
       retries_left--;
       Logger.getLogger(getClass().getName()).
               log(Level.INFO, "Auto-Reconnect Attempt #{0} of {1}",
-                      new Object[]{auto_reconnect_retry - retries_left,
-                        auto_reconnect_retry});
+                  new Object[]{auto_reconnect_retry - retries_left,
+                               auto_reconnect_retry});
       try {
         wait(auto_reconnect_time);
         connected = reconnect(hostname_local_cache,
-                username_local_cache, password_local_cache,
-                database_local_cache);
+                              username_local_cache, password_local_cache,
+                              database_local_cache);
       } catch (InterruptedException i) {
         Logger.getLogger(getClass().getName()).
                 log(Level.WARNING, "Reconnect Canceled!", i);
@@ -454,6 +453,7 @@ public class SimpleMySQL {
   /**
    * Old style SimpleMySQL query.
    *
+   * @throws simplemysql.exception.SimpleMySQLException
    * @deprecated This method is replaced by the new
    * {@link #Query(java.lang.String)} method.
    * @param query
@@ -462,34 +462,30 @@ public class SimpleMySQL {
    * @see #Query(java.lang.String)
    */
   @Deprecated
-  public ResultSet query(String query) {
+  public ResultSet query(String query) throws SimpleMySQLException {
     return Query(query).getResultSet();
   }
 
-  private SimpleMySQLResult executeQuery(String query) {
-    Statement stmt;
-    ResultSet mysql_result;
+  private SimpleMySQLResult executeQuery(String query) throws
+          SimpleMySQLException {
+    if(mysql_connection == null) {
+      throw new SimpleMySQLException("No conection available to execute query");
+    }
     SimpleMySQLResult result = null;
-
     try {
+        Statement stmt = mysql_connection.createStatement();
       if (query.startsWith("SELECT")) {
-        stmt = mysql_connection.createStatement();
-        mysql_result = stmt.executeQuery(query);
+        ResultSet mysql_result = stmt.executeQuery(query);
         result = new SimpleMySQLResult(mysql_result);
       } else {
-        stmt = mysql_connection.createStatement();
         stmt.executeUpdate(query);
       }
-    } catch (NullPointerException ex) {
-      Logger.getLogger(getClass().getName()).
-              log(Level.WARNING,
-                      "You are not connected to a MySQL server", ex);
-    } catch (MySQLNonTransientConnectionException ex) {
-      Logger.getLogger(getClass().getName()).
-              log(Level.WARNING, "MySQL server Connection was lost", ex);
-    } catch (SQLException ex) {
-      Logger.getLogger(getClass().getName()).
-              log(Level.WARNING, "Error.", ex);
+    } catch (NullPointerException e) {
+      throw new SimpleMySQLException("Not connected to a MySQL server", e);
+    } catch (MySQLNonTransientConnectionException e) {
+      throw new SimpleMySQLException("Connection lost", e);
+    } catch (SQLException e) {
+      throw new SimpleMySQLException("Can't execute query", e);
     }
 
     return result;
@@ -502,12 +498,13 @@ public class SimpleMySQL {
    * @param query
    * @return For SELECT type queries a SimpleMySQLResult. All other type of
    * queries will return null
+   * @throws simplemysql.exception.SimpleMySQLException
    * @see #connect()
    * @see #connect(java.lang.String, java.lang.String, java.lang.String)
    * @see #connect(java.lang.String, java.lang.String, java.lang.String,
    * java.lang.String)
    */
-  public SimpleMySQLResult Query(String query) {
+  public SimpleMySQLResult Query(String query) throws SimpleMySQLException {
     check_connection();
     return executeQuery(query);
   }
@@ -530,7 +527,7 @@ public class SimpleMySQL {
    * java.lang.String)
    */
   public void Query(SimpleAsyncMySQLTransactionHandler handler,
-          String... queries) throws SimpleMySQLException {
+                    String... queries) throws SimpleMySQLException {
     check_connection();
     try {
       mysql_connection.setAutoCommit(false);

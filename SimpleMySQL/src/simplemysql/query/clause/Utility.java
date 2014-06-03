@@ -1,13 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package simplemysql.query.clause;
 
 /**
  *
- * @author Daniel
+ * @author Daniel Castro
  */
 class Utility {
 
@@ -20,7 +15,7 @@ class Utility {
    * @param column the column to apply function
    */
   static void function(StringBuilder query, String function, boolean distinct,
-          String column) {
+                       String column) {
     query.append(function).append("(");
     if (distinct) {
       query.append("DISTINCT ");
@@ -38,7 +33,7 @@ class Utility {
    * @param column the column to apply function
    */
   static void function(StringBuilder query, String function, boolean distinct,
-          String table, String column) {
+                       String table, String column) {
     query.append(function).append("(");
     if (distinct) {
       query.append("DISTINCT ");

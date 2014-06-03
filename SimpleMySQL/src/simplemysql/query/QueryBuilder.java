@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package simplemysql.query;
 
 import simplemysql.query.clause.InsertClauseValues;
@@ -22,7 +17,7 @@ import simplemysql.query.clause.HavingClause;
  * strings. It is not intended to produce correct queries, thats up to the
  * programer.
  *
- * @author Daniel
+ * @author Daniel Castro
  */
 public class QueryBuilder {
 
@@ -169,7 +164,7 @@ public class QueryBuilder {
    * @return this
    */
   public QueryBuilder INSERT(String table, InsertClauseColumns columns,
-          InsertClauseValues... values) {
+                             InsertClauseValues... values) {
     query.append("INSERT INTO `").append(table).append("`");
     query.append(columns.toString());
     query.append("VALUES ");
@@ -183,7 +178,7 @@ public class QueryBuilder {
   }
 
   public QueryBuilder CREATE_TABLE(boolean ifNotExists, String tableName,
-          CreateTableClause struct) {
+                                   CreateTableClause struct) {
     query.append("CREATE TABLE ");
     if (ifNotExists) {
       query.append("IF NOT EXISTS ");
@@ -216,7 +211,7 @@ public class QueryBuilder {
   }
 
   public QueryBuilder ALTER_TABLE_ADD(boolean ignore, String table,
-          String column, String columnDefinition) {
+                                      String column, String columnDefinition) {
     query.append("ALTER ");
     if (ignore) {
       query.append("IGNORE ");
@@ -227,7 +222,7 @@ public class QueryBuilder {
   }
 
   public QueryBuilder ALTER_TABLE_MODIFY(boolean ignore, String table,
-          String column, String columnDefinition) {
+                                         String column, String columnDefinition) {
     query.append("ALTER ");
     if (ignore) {
       query.append("IGNORE ");
@@ -239,7 +234,7 @@ public class QueryBuilder {
   }
 
   public QueryBuilder ALTER_TABLE_DROP(boolean ignore, String table,
-          String column) {
+                                       String column) {
     query.append("ALTER ");
     if (ignore) {
       query.append("IGNORE ");

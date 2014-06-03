@@ -1,15 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package simplemysql.query.clause;
 
 import simplemysql.query.QueryBuilder;
 
 /**
  *
- * @author Daniel
+ * @author Daniel Castro
  */
 public class WhereClause {
 
@@ -49,7 +44,7 @@ public class WhereClause {
   }
 
   public WhereClause compareWithValue(String column, String comparator,
-          String value) {
+                                      String value) {
     String newValue = Utility.escape(value);
     query.append("`").append(column).append("`").append(comparator).
             append("'").append(newValue).append("' ");
@@ -57,7 +52,7 @@ public class WhereClause {
   }
 
   public WhereClause compareWithValue(String table, String column,
-          String comparator, String value) {
+                                      String comparator, String value) {
     String newValue = Utility.escape(value);
     query.append("`").append(table).append("`.`").append(column).append("`").
             append(comparator).append("'").append(newValue).append("' ");
@@ -65,14 +60,15 @@ public class WhereClause {
   }
 
   public WhereClause compareWithColumn(String column1, String comparator,
-          String column2) {
+                                       String column2) {
     query.append("`").append(column1).append("`").append(comparator).
             append("`").append(column2).append("` ");
     return this;
   }
 
   public WhereClause compareWithColumn(String table1, String column1,
-          String comparator, String table2, String column2) {
+                                       String comparator, String table2,
+                                       String column2) {
     query.append("`").append(table1).append("`.`").append(column1).
             append("`").append(comparator).append("`").append(table2).
             append("`.`").append(column2).append("` ");

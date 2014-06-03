@@ -1,13 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package simplemysql.query.clause;
 
 /**
  *
- * @author Daniel
+ * @author Daniel Castro
  */
 public class CreateTableClause {
 
@@ -41,7 +36,7 @@ public class CreateTableClause {
   }
 
   public CreateTableClause addForeignKey(String column, String foreighTable,
-          String foreignColumn, String options) {
+                                         String foreignColumn, String options) {
     query.append("FOREIGN KEY(`").append(column).append("`) ").
             append("REFERENCES `").append(foreighTable).append("`(`").
             append(foreignColumn).append("`) ").append(options).append(", ");
@@ -49,7 +44,7 @@ public class CreateTableClause {
   }
 
   public CreateTableClause addForeignKey(String column, String foreighTable,
-          String foreignColumn) {
+                                         String foreignColumn) {
     return addForeignKey(column, foreighTable, foreignColumn, "");
   }
 

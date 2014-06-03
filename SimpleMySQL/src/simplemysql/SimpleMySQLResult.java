@@ -43,7 +43,7 @@ import simplemysql.exception.ResultException;
 
 /**
  *
- * @author Daniel Morante <daniel@morante.net>
+ * @author Daniel Morante, Daniel Castro
  */
 public class SimpleMySQLResult {
 
@@ -60,7 +60,9 @@ public class SimpleMySQLResult {
   }
 
   /**
-   * Get the current row as a standard String array.
+   * Gets the current row as a standard String array. Does not move to the next
+   * row, use {@link #next()} to move to the next row.
+   *
    *
    * @return String Array with all columns
    * @throws simplemysql.exception.ResultException
@@ -68,11 +70,14 @@ public class SimpleMySQLResult {
   public String[] FetchArray() throws ResultException {
     String[] columns = null;
     try {
+      save_position();
       RESULT_SET.next();
       columns = new String[RESULT_SET.getMetaData().getColumnCount()];
-      for (int column = 1; column <= RESULT_SET.getMetaData().getColumnCount(); column++) {
+      int columnCount = RESULT_SET.getMetaData().getColumnCount();
+      for (int column = 1; column <= columnCount; column++) {
         columns[column - 1] = RESULT_SET.getString(column);
       }
+      restore_position();
     } catch (SQLException e) {
       throw new ResultException("Can't fetch array", e);
     }
@@ -80,7 +85,8 @@ public class SimpleMySQLResult {
   }
 
   /**
-   * Get the current row as a hash map.
+   * Gets the current row as a hash map. Does not move to the next row, use
+   * {@link #next()} to move to the next row.
    *
    * Similar to an associative array. Each column can be referenced by name
    * using the get() method.
@@ -91,11 +97,15 @@ public class SimpleMySQLResult {
   public Map<String, String> FetchAssoc() throws ResultException {
     Map<String, String> map = null;
     try {
+      save_position();
       RESULT_SET.next();
       map = new HashMap<>();
-      for (int column = 1; column <= RESULT_SET.getMetaData().getColumnCount(); column++) {
-        map.put(RESULT_SET.getMetaData().getColumnLabel(column), RESULT_SET.getString(column));
+      for (int column = 1; column <= RESULT_SET.getMetaData().getColumnCount();
+           column++) {
+        map.put(RESULT_SET.getMetaData().getColumnLabel(column), RESULT_SET.
+                getString(column));
       }
+      restore_position();
     } catch (SQLException e) {
       throw new ResultException("Can't fetch assoc", e);
     }
@@ -249,7 +259,7 @@ public class SimpleMySQLResult {
    * no effect if the result set contains no rows.
    *
    * @throws simplemysql.exception.ResultException if SQLException ocurred
-   * @see ResultSet#beforeFirst() 
+   * @see ResultSet#beforeFirst()
    */
   public void beforeFirst() throws ResultException {
     try {
@@ -297,7 +307,7 @@ public class SimpleMySQLResult {
    * @return the column value; if the value is SQL NULL, the value returned is
    * null
    * @throws simplemysql.exception.ResultException if SQLException ocurred
-   * @see ResultSet#getString(java.lang.String) 
+   * @see ResultSet#getString(java.lang.String)
    */
   public String getString(String columnLabel) throws ResultException {
     String returnValue = null;
@@ -319,12 +329,12 @@ public class SimpleMySQLResult {
 
   /**
    * Retrieves the value of the designated column in the current row.
-   * 
+   *
    * @param columnIndex the first column is 1, the second is 2, ...
    * @return the column value; if the value is SQL NULL, the value returned is
    * null
    * @throws simplemysql.exception.ResultException if SQLException ocurred
-   * @see ResultSet#getString(int) 
+   * @see ResultSet#getString(int)
    */
   public String getString(int columnIndex) throws ResultException {
     String returnValue = null;

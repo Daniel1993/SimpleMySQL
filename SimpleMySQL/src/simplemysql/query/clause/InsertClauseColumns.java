@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package simplemysql.query.clause;
 
 /**
@@ -12,9 +7,9 @@ package simplemysql.query.clause;
  * table column. Use this clause creator only with QueryBuilder.INSERT
  * statement.
  *
- * @author Daniel
+ * @author Daniel Castro
  */
-public class InsertClauseColumns extends ClauseCreator {
+public class InsertClauseColumns extends Clause {
 
   /**
    * Initiates a InsertClauseColumns instance.
